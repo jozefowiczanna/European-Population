@@ -10,10 +10,14 @@ let year = 2017;
 const colors = { // names matching sass variables
 	"green-dark": "#4ba136",
 	"green-medium": "#55C738",
-	"green-light": "#73D742",
+	"green-light": "#70E236",
 	"green-bright": "#B4EB47",
 	"yellow": "#E8D930"
 }
+
+const tooltip = document.createElement("div");
+tooltip.classList.add("map-tooltip");
+document.body.appendChild(tooltip);
 
 function numberWithSpaces(nr) { // 5000000 -> 5 000 000 (non-breaking space)
     return nr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "&nbsp");
@@ -71,7 +75,7 @@ function getData(year){
 			countriesData = resp[1];
 			fillTable(year);
 			assignData();
-			addTooltip();
+			fillTooltip();
 			btnYear.removeAttribute("disabled");
 		})
 		.catch(function(err){
@@ -99,15 +103,11 @@ function fillTable(data){
 	tableBody.innerHTML = tableContent;
 }
 
-function addTooltip(){
-	const tooltip = document.createElement("div");
-	tooltip.classList.add("map-tooltip");
-	document.body.appendChild(tooltip);
-
+function fillTooltip(){
 	for(el of countriesElements){
 		let orgFill = el.style.fill;
 		el.addEventListener("mousemove", function(e){
-			this.style.fill = "#676767";
+			// this.style.fill = "#676767";
 			const population = numberWithSpaces(this.dataset.population);
 			tooltip.innerHTML =
 			`
@@ -139,7 +139,8 @@ function addTooltip(){
 
 btnYear.addEventListener("click", function(){
 	btnYear.disabled = "disabled";
-	getData(selectYear.value);
+	year = selectYear.value;
+	getData(year);
 })
 
 getData(year);
