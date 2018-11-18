@@ -48,21 +48,6 @@ gulp.task('js', function(done){
 	done();
 })
 
-//temp function - need to create set of production functions
-//I didn't want to move index.html file permamently
-gulp.task('copy', function(done){
-	//index.html file has to be in the main folder, but I don't want to mess with original file structure
-	gulp.src('development/index.html')
-  .pipe(gulp.dest('./'));
-
-	//update links in the copied index.html file
-	gulp.src('index.html')
-    .pipe(replace('css/style.css', 'development/css/style.css'))
-		.pipe(replace('js/script.js', 'development/script/script.js'))
-		.pipe(gulp.dest('./'));
-	done();
-})
-
 const seriesFunctions= gulp.series('html', 'js', 'compass');
 const parallelFunctions = gulp.parallel('connect', 'watch');
 
