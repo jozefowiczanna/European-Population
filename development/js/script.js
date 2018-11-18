@@ -7,6 +7,13 @@ const countriesList = ["al", "at", "by", "be", "ba", "bg", "hr", "cz", "dk", "ee
 countriesList.sort();
 let countriesData = [];
 let year = 2017;
+const colors = { // names matching sass variables
+	"green-dark": "#4ba136",
+	"green-medium": "#55C738",
+	"green-light": "#73D742",
+	"green-bright": "#B4EB47",
+	"yellow": "#E8D930"
+}
 
 function numberWithSpaces(nr) { // 5000000 -> 5 000 000 (non-breaking space)
     return nr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "&nbsp");
@@ -40,15 +47,15 @@ function assignData(){
 		current.dataset.population = population;
 		current.dataset.year = c.date;
 		if(population > 60000000){
-			current.style.fill = "hsla(108, 50%, 42%, 1)";
+			current.style.fill = colors["green-dark"];
 		}else if(population>30000000){
-			current.style.fill = "hsla(108, 56%, 50%, 1)";
+			current.style.fill = colors["green-medium"];
 		}else if(population>10000000){
-			current.style.fill = "hsla(100, 65%, 55%, 1)";
+			current.style.fill = colors["green-light"];
 		}else if(population>5000000){
-			current.style.fill = "hsla(80, 80%, 60%, 1)";
+			current.style.fill = colors["green-bright"];
 		}else if(population>0){
-			current.style.fill = "hsla(55, 80%, 55%, 1)"
+			current.style.fill = colors["yellow"];
 		}
 	}
 }

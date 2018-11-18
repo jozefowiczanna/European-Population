@@ -1,1 +1,4 @@
-donttrack.html
+.tmp
+.sass-cache
+node_modules
+development/assets/*
