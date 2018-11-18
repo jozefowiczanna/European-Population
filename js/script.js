@@ -3,14 +3,10 @@ const selectYear = document.querySelector("#select-year");
 const map = document.querySelector(".map");
 const tableBody = document.querySelector(".table-body");
 const countriesElements = document.querySelectorAll(".country");
-const countriesList = [...countriesElements].map(el => el.dataset.country);
+const countriesList = ["al", "at", "by", "be", "ba", "bg", "hr", "cz", "dk", "ee", "mk", "fi", "fr", "de", "gr", "hu", "is", "ie", "it", "lv", "lt", "mt", "md", "me", "no", "pl", "pt", "ro", "ru", "rs", "sk", "si", "es", "se", "ch", "nl", "tr", "ua", "gb"];
 countriesList.sort();
 let countriesData = [];
-const promises = [];
-let dataReady = false;
-let year = 2018;
-
-// ============================================ functions
+let year = 2017;
 
 function numberWithSpaces(nr) { // 5000000 -> 5 000 000 (non-breaking space)
     return nr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "&nbsp");
@@ -20,16 +16,29 @@ function sortPopulation(tab){
 	const newTab = tab.sort(function(a, b) {
     return b.total_population.population - a.total_population.population;
 	});
-	return newTab;
+	return tab;
 }
 
-function assignData(data){
-	for(const c of data){
-		current = document.querySelector(`[data-country="${c.country}"]`);
-		current.dataset.population = c.total_population.population;
-		let population = current.dataset.population;
+function addYearsToForm(){
+	let template =
+	`<option value="2017">2017</option>
+	`;
+	for (var i = 2016; i > 1959; i--) {
+		template +=
+		`<option value="${i}">${i}</option>
+		`;
 
-		//kolorowanie mapy w zależności od liczby mieszkańców
+	}
+	selectYear.innerHTML = template;
+}
+addYearsToForm()
+
+function assignData(){
+	for(const c of countriesData){
+		current = document.querySelector(`[data-country="${c.country.value}"]`);
+		var population = (c.value === "undefined" || c.value === null) ? "no data available" : c.value;
+		current.dataset.population = population;
+		current.dataset.year = c.date;
 		if(population > 60000000){
 			current.style.fill = "hsla(108, 50%, 42%, 1)";
 		}else if(population>30000000){
@@ -46,60 +55,35 @@ function assignData(data){
 
 function getData(year){
 	countriesData = [];
-	for (let i = 0; i < countriesList.length; i++) {
-		promises[i] = new Promise(function(resolve, reject) {
-			let country = countriesList[i];
-			let obj = {
-				country : country
-			}
-			let url = "http://api.population.io:80/1.0/population/"+encodeURI(country)+"/"+year+"-01-01/";
-					fetch(url, {mode: "no-cors"})
-						.then(resp => resp.json())
-						.then(resp => {
-							if(!resp.total_population){
-								obj.total_population = {
-									date: "ERROR",
-									population: "ERROR"
-								}
-							}else{
-								obj.total_population = resp.total_population;
-							}
-							countriesData.push(obj);
-							resolve(resp);
-						})
-						.catch(function(err){
-							obj.total_population = {
-								date: "ERROR",
-								population: "ERROR"
-							}
-							countriesData.push(obj)
-							reject("ERROR")
-							console.log(err);
-						})
-		    });
-	}
+	const countries = countriesList.join(";");
+	const url = "https://api.worldbank.org/v2/countries/"+countries+"/indicators/SP.POP.TOTL?date="+year+"&format=json";
 
-	Promise.all(promises)
+	fetch(url)
+		.then(resp => resp.json())
 		.then(resp => {
-			dataReady = true;
-			assignData(countriesData);
-			const countriesSorted = sortPopulation(countriesData);
-			fillTable(countriesSorted);
+			countriesData = resp[1];
+			fillTable(year);
+			assignData();
 			addTooltip();
-		}).catch(err => console.log(err));
-		btnYear.removeAttribute("disabled")
+			btnYear.removeAttribute("disabled");
+		})
+		.catch(function(err){
+			console.log(err);
+		})
 }
-
-// --------------- wypełnianie tabelki danymi
 
 function fillTable(data){
 	tableBody.innerHTML = "";
 	tableContent = "";
-	for(c of data){
-		const population = numberWithSpaces(c.total_population.population);
+	for(c of countriesData){
+		if(!c.value){
+			var population = "NO DATA";
+		} else {
+			var population = numberWithSpaces(c.value);
+		}
 		const tableRow =
 		`<tr>
-			<td>${c.country}</th>
+			<td>${c.country.value}</th>
 			<td class="text-right">${population}</td>
 		</tr>
 		`;
@@ -108,11 +92,7 @@ function fillTable(data){
 	tableBody.innerHTML = tableContent;
 }
 
-
-
-// tooltip hover
 function addTooltip(){
-	// dodanie tooltip do strony
 	const tooltip = document.createElement("div");
 	tooltip.classList.add("map-tooltip");
 	document.body.appendChild(tooltip);
@@ -152,7 +132,7 @@ function addTooltip(){
 
 btnYear.addEventListener("click", function(){
 	btnYear.disabled = "disabled";
-	getData(selectYear.value)
+	getData(selectYear.value);
 })
 
 getData(year);
