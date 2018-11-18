@@ -2,7 +2,8 @@ const gulp = require('gulp'),
 		log = require('fancy-log'),
 		compass = require('gulp-compass'),
 		path = require('path'),
-		connect = require('gulp-connect');
+		connect = require('gulp-connect'),
+		replace = require('gulp-replace');
 
 const sassSources = ['development/sass/style.scss'];
 const htmlSources = ['development/*.html'];
@@ -44,6 +45,21 @@ gulp.task('html', function(done){
 gulp.task('js', function(done){
 	gulp.src(jsSources)
 	.pipe(connect.reload());
+	done();
+})
+
+//temp function - need to create set of production functions
+//I didn't want to move index.html file permamently
+gulp.task('copy', function(done){
+	//index.html file has to be in the main folder, but I don't want to mess with original file structure
+	gulp.src('development/index.html')
+  .pipe(gulp.dest('./'));
+
+	//update links in the copied index.html file
+	gulp.src('index.html')
+    .pipe(replace('css/style.css', 'development/css/style.css'))
+		.pipe(replace('js/script.js', 'development/script/script.js'))
+		.pipe(gulp.dest('./'));
 	done();
 })
 
