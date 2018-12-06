@@ -15,7 +15,7 @@
 
 	<div class="header-wrapper">
 		<header class="cnt">
-			<h2>European population <span class="title">in years 2013-2018</span></h2>
+			<h2>European population <span class="title">in years 1960-2017</span></h2>
 		</header>
 	</div>
 	<main class="cnt">
@@ -23,8 +23,11 @@
 
 			<form class="get-data">
 
-				<label for="select-year">Choose date (1960-2017)</label>
-			  <select class="form-control" id="select-year" name="choose-year">
+				<label for="select-first-year">Choose dates (1960-2017) and compare population values</label>
+			  <select class="form-control" id="select-first-year" name="select-first-year">
+				</select>
+				<label for="select-second-year" aria-hidden="true">Select second year</label>
+			  <select class="form-control" id="select-second-year" name="select-second-year">
 				</select>
 				<button type="button" class="btn-year">Get data</button>
 			</form>
@@ -36,7 +39,8 @@
 				  <thead class="thead-dark">
 				    <tr>
 				      <th scope="col">Country</th>
-				      <th scope="col">Population</th>
+				      <th scope="col" class="th-first-year text-right">2016</th>
+							<th scope="col" class="th-second-year text-right">2017</th>
 				    </tr>
 				  </thead>
 				  <tbody class="table-body">
@@ -49,7 +53,7 @@
 
 					<div class="map-legend">
 
-						<div class="population">Population:</div>
+						<div class="population">Population in <span class="population-year">2017</span>:</div>
 						<div class="legend">
 							<div class="color color1"></div>
 							<div>0-5 mln</div>

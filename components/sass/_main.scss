@@ -58,12 +58,12 @@ header span {
 	display: flex;
 	position: relative;
 	overflow: auto;
-	flex: 7 0 500px;
+	flex: 2 0 400px;
 	width: 50%;
 }
 
 .map {
-	min-width: 850px;
+	min-width: 750px;
 	width: 100%;
 }
 
@@ -81,11 +81,16 @@ header span {
 	select {
 		width: auto;
 		height: auto;
-		margin: 0 1em;
+		margin-right: 0.5em;
 	}
 
 	label {
 		margin: 0;
+		margin-right: 0.5em;
+	}
+
+	label[for=select-second-year] {
+		display: none;
 	}
 }
 

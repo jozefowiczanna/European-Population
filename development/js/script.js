@@ -1,12 +1,19 @@
 const btnYear = document.querySelector(".btn-year");
-const selectYear = document.querySelector("#select-year");
+const selectFirstYear = document.querySelector("#select-first-year");
+const selectSecondYear = document.querySelector("#select-second-year");
+const thFirstYear = document.querySelector(".th-first-year");
+const thSecondYear = document.querySelector(".th-second-year");
 const map = document.querySelector(".map");
 const tableBody = document.querySelector(".table-body");
 const countriesElements = document.querySelectorAll(".country");
+const populationYear = document.querySelector(".population-year");
 const countriesList = ["al", "at", "by", "be", "ba", "bg", "hr", "cz", "dk", "ee", "mk", "fi", "fr", "de", "gr", "hu", "is", "ie", "it", "lv", "lt", "mt", "md", "me", "no", "pl", "pt", "ro", "ru", "rs", "sk", "si", "es", "se", "ch", "nl", "tr", "ua", "gb"];
 countriesList.sort();
-let countriesData = [];
-let year = 2017;
+let countriesData = {
+	date : {}
+}
+let firstYear = 2016;
+let secondYear = 2017;
 const colors = { // names matching sass variables
 	"green-dark": "#4ba136",
 	"green-medium": "#55C738",
@@ -14,6 +21,7 @@ const colors = { // names matching sass variables
 	"green-bright": "#B4EB47",
 	"yellow": "#E8D930"
 }
+
 
 const tooltip = document.createElement("div");
 tooltip.classList.add("map-tooltip");
@@ -40,12 +48,14 @@ function addYearsToForm(){
 		`;
 
 	}
-	selectYear.innerHTML = template;
+	selectFirstYear.innerHTML = template;
+	selectSecondYear.innerHTML = template;
+	selectFirstYear.children[1].selected = "selected";
 }
 addYearsToForm()
 
-function assignData(){
-	for(const c of countriesData){
+function colorMap(){
+	for(const c of countriesData.date[secondYear]){
 		current = document.querySelector(`[data-country="${c.country.value}"]`);
 		var population = (c.value === "undefined" || c.value === null) ? "no data available" : c.value;
 		current.dataset.population = population;
@@ -64,38 +74,32 @@ function assignData(){
 	}
 }
 
-function getData(year){
-	countriesData = [];
-	const countries = countriesList.join(";");
-	const url = "https://api.worldbank.org/v2/countries/"+countries+"/indicators/SP.POP.TOTL?date="+year+"&format=json";
+// sortuj rosnaco wg liczby ludnosci
+// let tab2 = sortyear.slice();
+// tab2.sort(function(a, b) {
+// 		return a.value - b.value;
+// });
 
-	fetch(url)
-		.then(resp => resp.json())
-		.then(resp => {
-			countriesData = resp[1];
-			fillTable(year);
-			assignData();
-			fillTooltip();
-			btnYear.removeAttribute("disabled");
-		})
-		.catch(function(err){
-			console.log(err);
-		})
-}
+
+
 
 function fillTable(data){
 	tableBody.innerHTML = "";
 	tableContent = "";
-	for(c of countriesData){
-		if(!c.value){
-			var population = "NO DATA";
-		} else {
-			var population = numberWithSpaces(c.value);
-		}
+	thFirstYear.innerHTML = firstYear;
+	thSecondYear.innerHTML = secondYear;
+
+	for (var i = 0; i < countriesData.date[secondYear].length; i++) {
+		const country = countriesData.date[firstYear][i]["country"]["value"];
+		const year1 = countriesData.date[firstYear][i];
+		const year2 = countriesData.date[secondYear][i];
+		population1 = (!year1.value) ? "NO DATA" : numberWithSpaces(year1.value);
+		population2 = (!year2.value) ? "NO DATA" : numberWithSpaces(year2.value);
 		const tableRow =
 		`<tr>
-			<td>${c.country.value}</th>
-			<td class="text-right">${population}</td>
+			<td>${country}</td>
+			<td class="text-right">${population1}</td>
+			<td class="text-right">${population2}</td>
 		</tr>
 		`;
 		tableContent += tableRow;
@@ -112,7 +116,7 @@ function fillTooltip(){
 			tooltip.innerHTML =
 			`
 			<h3>${this.dataset.country}</h3>
-			<div>Population (${year}):
+			<div>Population (${secondYear}):
 				${population}
 			</div>
 			`;
@@ -139,8 +143,90 @@ function fillTooltip(){
 
 btnYear.addEventListener("click", function(){
 	btnYear.disabled = "disabled";
-	year = selectYear.value;
+	year = selectFirstYear.value;
 	getData(year);
 })
 
-getData(year);
+// ------------ fetch url
+
+function getData(resolve, reject, year){
+	const countries = countriesList.join(";");
+	const url = "https://api.worldbank.org/v2/countries/"+countries+"/indicators/SP.POP.TOTL?date="+year+"&format=json";
+	if(!countriesData.date.hasOwnProperty(year)){
+		fetch(url)
+			.then(resp => resp.json())
+			.then(resp => {
+				countriesData.date[year] = resp[1];
+				resolve(resp);
+
+			})
+			.catch(function(err){
+				console.log(err);
+				reject(err);
+			})
+	}
+
+}
+
+// ------------- set both promises, then run promise all
+
+function getAllData(){
+
+	promise1 = new Promise(function(resolve, reject){
+		getData(resolve, reject, firstYear);
+	});
+	promise2 = new Promise(function(resolve, reject){
+		getData(resolve, reject, secondYear);
+	});
+
+	Promise.all([promise1, promise2])
+
+		.then(resp => {
+			dataReady = true;
+			fillTable(secondYear);
+			colorMap();
+			fillTooltip();
+			btnYear.removeAttribute("disabled");
+		}).catch(err => console.log(err))
+
+	//po najechaniu na mysz pokazuje się tooltip z liczbą ludności
+	for (const el of countriesElements) {
+		el.addEventListener("mouseenter", function(e){
+			console.log(e.target.dataset.country, e.target.dataset.population);
+		})
+	}
+
+}
+
+getAllData();
+
+// --------------
+
+// function getAllData(){
+//
+// 		promises[i] = new Promise(function(resolve, reject) {
+// 			let country = countriesList[i];
+// 			let obj = {
+// 				country : country
+// 			}
+// 			let url = "http://api.population.io:80/1.0/population/"+encodeURI(country)+"/2018-01-01/";
+// 					fetch(url)
+// 						.then(resp => resp.json())
+// 						.then(resp => {
+// 							obj.total_population = resp.total_population;
+// 							countriesData.push(obj);
+// 							resolve(resp);
+// 						})
+// 						.catch(function(err){
+// 							obj.total_population.population = "ERROR";
+// 							countriesData.push(obj)
+// 							reject("ERROR")
+// 						})
+// 		    });
+// 	var promise1 = new Promise(function(resolve, reject) {
+//
+//
+//
+// });
+//
+// }
