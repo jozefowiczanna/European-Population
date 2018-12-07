@@ -1,5 +1,10 @@
 html {
 	font-size: 18px;
+
+}
+
+body {
+	// color: yellow;
 }
 
 .header-wrapper {
@@ -53,6 +58,12 @@ header span {
 .color4 {background-color: $green-medium}
 .color5 {background-color: $green-dark}
 
+.fill-color1 {fill: $yellow}
+.fill-color2 {fill: $green-bright}
+.fill-color3 {fill: $green-light}
+.fill-color4 {fill: $green-medium}
+.fill-color5 {fill: $green-dark}
+
 
 .map-cnt {
 	display: flex;
@@ -98,10 +109,59 @@ header span {
 
 .table-population {
 	flex: 1 0 250px;
-	max-width: 500px;
+	max-width: 900px;
 	margin-right: 1em;
 	font-family: 'Roboto', sans-serif;
 }
+
+.green-nr {
+	color: $green-nr;
+}
+.red-nr {
+	color: $red-nr;
+}
+
+.black-nr {
+	color: $text-color;
+}
+
+.table {
+	font-size: 0.95rem;
+	th {
+		position: relative;
+		cursor: pointer;
+	}
+	i {
+		position: absolute;
+		margin-left: 10px;
+		font-size: 0.8rem;
+		top: 50%;
+		transform: translateY(-50%);
+		// visibility: hidden;
+	}
+	.visible {
+		visibility: visible;
+	}
+	.i-down {
+		transform: translateY(-50%) rotate(180deg);
+	}
+	.text-right {
+		padding-right: 30px;
+	}
+
+	tr:hover {
+		background-color: $tr-hover;
+	}
+
+	th:hover {
+		background-color: $th-hover;
+		border-color: $th-hover;
+	}
+}
+.ascend {
+	visibility: visible;
+}
+
 
 // ------------------------ tooltip
 

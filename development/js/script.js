@@ -9,19 +9,12 @@ const countriesElements = document.querySelectorAll(".country");
 const populationYear = document.querySelector(".population-year");
 const countriesList = ["al", "at", "by", "be", "ba", "bg", "hr", "cz", "dk", "ee", "mk", "fi", "fr", "de", "gr", "hu", "is", "ie", "it", "lv", "lt", "mt", "md", "me", "no", "pl", "pt", "ro", "ru", "rs", "sk", "si", "es", "se", "ch", "nl", "tr", "ua", "gb"];
 countriesList.sort();
+let countriesTable;
 let countriesData = {
 	date : {}
 }
 let firstYear = 2016;
 let secondYear = 2017;
-const colors = { // names matching sass variables
-	"green-dark": "#4ba136",
-	"green-medium": "#55C738",
-	"green-light": "#70E236",
-	"green-bright": "#B4EB47",
-	"yellow": "#E8D930"
-}
-
 
 const tooltip = document.createElement("div");
 tooltip.classList.add("map-tooltip");
@@ -46,7 +39,6 @@ function addYearsToForm(){
 		template +=
 		`<option value="${i}">${i}</option>
 		`;
-
 	}
 	selectFirstYear.innerHTML = template;
 	selectSecondYear.innerHTML = template;
@@ -60,30 +52,28 @@ function colorMap(){
 		var population = (c.value === "undefined" || c.value === null) ? "no data available" : c.value;
 		current.dataset.population = population;
 		current.dataset.year = c.date;
+		current.classList.remove("fill-color1");
+		current.classList.remove("fill-color2");
+		current.classList.remove("fill-color3");
+		current.classList.remove("fill-color4");
+		current.classList.remove("fill-color5");
 		if(population > 60000000){
-			current.style.fill = colors["green-dark"];
+			current.classList.add("fill-color5");
 		}else if(population>30000000){
-			current.style.fill = colors["green-medium"];
+			current.classList.add("fill-color4");
 		}else if(population>10000000){
-			current.style.fill = colors["green-light"];
+			current.classList.add("fill-color3");
 		}else if(population>5000000){
-			current.style.fill = colors["green-bright"];
+			current.classList.add("fill-color2");
 		}else if(population>0){
-			current.style.fill = colors["yellow"];
+			current.classList.add("fill-color1");
 		}
 	}
 }
 
-// sortuj rosnaco wg liczby ludnosci
-// let tab2 = sortyear.slice();
-// tab2.sort(function(a, b) {
-// 		return a.value - b.value;
-// });
-
-
-
-
 function fillTable(data){
+
+	countriesTable = [];
 	tableBody.innerHTML = "";
 	tableContent = "";
 	thFirstYear.innerHTML = firstYear;
@@ -93,13 +83,29 @@ function fillTable(data){
 		const country = countriesData.date[firstYear][i]["country"]["value"];
 		const year1 = countriesData.date[firstYear][i];
 		const year2 = countriesData.date[secondYear][i];
+		// przygotowanie tablicy, ktora posluzy do biezacego sortowania danych w tabeli
+		countriesTable.push([country, year1.value, year2.value, year2.value - year1.value])
 		population1 = (!year1.value) ? "NO DATA" : numberWithSpaces(year1.value);
 		population2 = (!year2.value) ? "NO DATA" : numberWithSpaces(year2.value);
+		let comparison;
+		let textColor = "black-nr";
+		if((population1 !== "NO DATA") && (population2 !== "NO DATA")){
+			comparison = numberWithSpaces(year2.value - year1.value);
+			if(comparison[0] !== "-"){
+				comparison = "+" + comparison;
+				textColor = "green-nr";
+			} else {
+				textColor = "red-nr";
+			}
+		}else{
+			comparison = "NO DATA";
+		}
 		const tableRow =
 		`<tr>
 			<td>${country}</td>
 			<td class="text-right">${population1}</td>
 			<td class="text-right">${population2}</td>
+			<td class="text-right ${textColor}">${comparison}</td>
 		</tr>
 		`;
 		tableContent += tableRow;
@@ -142,17 +148,30 @@ function fillTooltip(){
 }
 
 btnYear.addEventListener("click", function(){
+	if(selectFirstYear.value === selectSecondYear.value){
+		alert
+	}
 	btnYear.disabled = "disabled";
-	year = selectFirstYear.value;
-	getData(year);
+	// chronologiczne uporządkowanie danych
+	if(parseInt(selectFirstYear.value, 10) < parseInt(selectFirstYear.value, 10)){
+		firstYear = parseInt(selectFirstYear.value, 10);
+		secondYear = parseInt(selectSecondYear.value, 10);
+	}else{
+		firstYear = parseInt(selectSecondYear.value, 10);
+		secondYear = parseInt(selectFirstYear.value, 10);
+	}
+
+	getAllData();
 })
 
 // ------------ fetch url
 
 function getData(resolve, reject, year){
-	const countries = countriesList.join(";");
-	const url = "https://api.worldbank.org/v2/countries/"+countries+"/indicators/SP.POP.TOTL?date="+year+"&format=json";
-	if(!countriesData.date.hasOwnProperty(year)){
+
+	// dane dotyczące konkretnego roku zaciągane są tylko raz
+	if (!countriesData.date.hasOwnProperty(year)){
+		const countries = countriesList.join(";");
+		const url = "https://api.worldbank.org/v2/countries/"+countries+"/indicators/SP.POP.TOTL?date="+year+"&format=json";
 		fetch(url)
 			.then(resp => resp.json())
 			.then(resp => {
@@ -164,8 +183,10 @@ function getData(resolve, reject, year){
 				console.log(err);
 				reject(err);
 			})
+	} else {
+		console.log("jest");
+		resolve(countriesData.date[year]);
 	}
-
 }
 
 // ------------- set both promises, then run promise all
@@ -178,9 +199,7 @@ function getAllData(){
 	promise2 = new Promise(function(resolve, reject){
 		getData(resolve, reject, secondYear);
 	});
-
 	Promise.all([promise1, promise2])
-
 		.then(resp => {
 			dataReady = true;
 			fillTable(secondYear);
@@ -189,44 +208,6 @@ function getAllData(){
 			btnYear.removeAttribute("disabled");
 		}).catch(err => console.log(err))
 
-	//po najechaniu na mysz pokazuje się tooltip z liczbą ludności
-	for (const el of countriesElements) {
-		el.addEventListener("mouseenter", function(e){
-			console.log(e.target.dataset.country, e.target.dataset.population);
-		})
-	}
-
 }
 
 getAllData();
-
-// --------------
-
-// function getAllData(){
-//
-// 		promises[i] = new Promise(function(resolve, reject) {
-// 			let country = countriesList[i];
-// 			let obj = {
-// 				country : country
-// 			}
-// 			let url = "http://api.population.io:80/1.0/population/"+encodeURI(country)+"/2018-01-01/";
-// 					fetch(url)
-// 						.then(resp => resp.json())
-// 						.then(resp => {
-// 							obj.total_population = resp.total_population;
-// 							countriesData.push(obj);
-// 							resolve(resp);
-// 						})
-// 						.catch(function(err){
-// 							obj.total_population.population = "ERROR";
-// 							countriesData.push(obj)
-// 							reject("ERROR")
-// 						})
-// 		    });
-// 	var promise1 = new Promise(function(resolve, reject) {
-//
-//
-//
-// });
-//
-// }
