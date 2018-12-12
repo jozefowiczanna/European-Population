@@ -228,13 +228,14 @@ header span {
   font-size: 0.8rem;
   top: 50%;
   transform: translateY(-50%);
+  visibility: hidden;
 }
 /* line 142, ../../components/sass/_main.scss */
 .table .visible {
   visibility: visible;
 }
 /* line 145, ../../components/sass/_main.scss */
-.table .i-down {
+.table .descending {
   transform: translateY(-50%) rotate(180deg);
 }
 /* line 148, ../../components/sass/_main.scss */
@@ -251,12 +252,7 @@ header span {
   border-color: #3c3c3c;
 }
 
-/* line 161, ../../components/sass/_main.scss */
-.ascend {
-  visibility: visible;
-}
-
-/* line 168, ../../components/sass/_main.scss */
+/* line 165, ../../components/sass/_main.scss */
 .map-tooltip {
   background-color: #fff;
   position: absolute;
@@ -266,31 +262,31 @@ header span {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* line 177, ../../components/sass/_main.scss */
+/* line 174, ../../components/sass/_main.scss */
 .map-tooltip h3 {
   font-size: 1.2rem;
   margin: 0;
 }
 
 @media screen and (max-width: 1100px) {
-  /* line 185, ../../components/sass/_main.scss */
+  /* line 182, ../../components/sass/_main.scss */
   .info {
     flex-direction: column;
   }
 
-  /* line 188, ../../components/sass/_main.scss */
+  /* line 185, ../../components/sass/_main.scss */
   .cnt {
     padding: 0.8rem;
   }
 
-  /* line 192, ../../components/sass/_main.scss */
+  /* line 189, ../../components/sass/_main.scss */
   .map-cnt {
     width: 100%;
     order: 1;
     flex: auto;
   }
 
-  /* line 197, ../../components/sass/_main.scss */
+  /* line 194, ../../components/sass/_main.scss */
   .table-population {
     order: 2;
     align-self: center;

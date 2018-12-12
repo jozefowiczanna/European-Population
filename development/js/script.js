@@ -7,6 +7,9 @@ const map = document.querySelector(".map");
 const tableBody = document.querySelector(".table-body");
 const countriesElements = document.querySelectorAll(".country");
 const populationYear = document.querySelector(".population-year");
+const categories = document.querySelectorAll(".table-population th");
+const icons = document.querySelectorAll(".table-population i");
+
 const countriesList = ["al", "at", "by", "be", "ba", "bg", "hr", "cz", "dk", "ee", "mk", "fi", "fr", "de", "gr", "hu", "is", "ie", "it", "lv", "lt", "mt", "md", "me", "no", "pl", "pt", "ro", "ru", "rs", "sk", "si", "es", "se", "ch", "nl", "tr", "ua", "gb"];
 countriesList.sort();
 let countriesTable;
@@ -22,13 +25,6 @@ document.body.appendChild(tooltip);
 
 function numberWithSpaces(nr) { // 5000000 -> 5 000 000 (non-breaking space)
     return nr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "&nbsp");
-}
-
-function sortPopulation(tab){
-	const newTab = tab.sort(function(a, b) {
-    return b.total_population.population - a.total_population.population;
-	});
-	return tab;
 }
 
 function addYearsToForm(){
@@ -71,47 +67,64 @@ function colorMap(){
 	}
 }
 
-function fillTable(data){
+// --------------------- fill table
 
-	countriesTable = [];
+function fillTable(countries){
 	tableBody.innerHTML = "";
 	tableContent = "";
 	thFirstYear.innerHTML = firstYear;
 	thSecondYear.innerHTML = secondYear;
 
-	for (var i = 0; i < countriesData.date[secondYear].length; i++) {
-		const country = countriesData.date[firstYear][i]["country"]["value"];
-		const year1 = countriesData.date[firstYear][i];
-		const year2 = countriesData.date[secondYear][i];
-		// przygotowanie tablicy, ktora posluzy do biezacego sortowania danych w tabeli
-		countriesTable.push([country, year1.value, year2.value, year2.value - year1.value])
-		population1 = (!year1.value) ? "NO DATA" : numberWithSpaces(year1.value);
-		population2 = (!year2.value) ? "NO DATA" : numberWithSpaces(year2.value);
-		let comparison;
+	for(cnt of countries){
+		// color last column to emphasize that this is a comparison of values
+		// "NO DATA" = black, plus = green, minus = red
 		let textColor = "black-nr";
-		if((population1 !== "NO DATA") && (population2 !== "NO DATA")){
-			comparison = numberWithSpaces(year2.value - year1.value);
-			if(comparison[0] !== "-"){
-				comparison = "+" + comparison;
+		const country = cnt[0];
+		const population1 = numberWithSpaces(cnt[1]);
+		const population2 = numberWithSpaces(cnt[2]);
+		let difference = numberWithSpaces(cnt[3]);
+		if (difference !== "NO DATA"){
+			if(difference[0] !== "-"){
+				difference = "+" + difference;
 				textColor = "green-nr";
 			} else {
 				textColor = "red-nr";
 			}
-		}else{
-			comparison = "NO DATA";
 		}
 		const tableRow =
 		`<tr>
 			<td>${country}</td>
 			<td class="text-right">${population1}</td>
 			<td class="text-right">${population2}</td>
-			<td class="text-right ${textColor}">${comparison}</td>
+			<td class="text-right ${textColor}">${difference}</td>
 		</tr>
 		`;
 		tableContent += tableRow;
 	}
 	tableBody.innerHTML = tableContent;
 }
+
+
+
+// ------------------ set table
+
+function setTableData(){
+	countriesTable = [];
+	for (var i = 0; i < countriesData.date[secondYear].length; i++) {
+		const country = countriesData.date[firstYear][i]["country"]["value"];
+		let year1 = (countriesData.date[firstYear][i].value) ? (countriesData.date[firstYear][i].value) : "NO DATA";
+		let year2 = (countriesData.date[secondYear][i].value) ? (countriesData.date[secondYear][i].value) : "NO DATA";
+		// przygotowanie tablicy, ktora posluzy do biezacego sortowania danych w tabeli
+		const difference = (year1 === "NO DATA" || year2 === "NO DATA") ? "NO DATA" : (year2 - year1);
+		countriesTable.push([country, year1, year2, difference]);
+
+		fillTable(countriesTable);
+	}
+}
+
+// ---------------------------- fill tooltip
+
+//
 
 function fillTooltip(){
 	for(el of countriesElements){
@@ -147,18 +160,28 @@ function fillTooltip(){
 	}
 }
 
+// ---------------------------- btnYear click
+
 btnYear.addEventListener("click", function(){
+	populationYear.innerHTML = selectSecondYear.value;
 	if(selectFirstYear.value === selectSecondYear.value){
-		alert
-	}
-	btnYear.disabled = "disabled";
-	// chronologiczne uporządkowanie danych
-	if(parseInt(selectFirstYear.value, 10) < parseInt(selectFirstYear.value, 10)){
-		firstYear = parseInt(selectFirstYear.value, 10);
-		secondYear = parseInt(selectSecondYear.value, 10);
+		alert("Select two different years!");
 	}else{
-		firstYear = parseInt(selectSecondYear.value, 10);
-		secondYear = parseInt(selectFirstYear.value, 10);
+		// reset icon in table
+		for (var i = 0; i < icons.length; i++) {
+			icons[i].classList.remove("visible");
+			icons[i].classList.remove("descending");
+		}
+		icons[0].classList.add("visible");
+		// chronologiczne uporządkowanie danych
+		if(parseInt(selectFirstYear.value, 10) < parseInt(selectSecondYear.value, 10)){
+			firstYear = parseInt(selectFirstYear.value, 10);
+			secondYear = parseInt(selectSecondYear.value, 10);
+		}else{
+			firstYear = parseInt(selectSecondYear.value, 10);
+			secondYear = parseInt(selectFirstYear.value, 10);
+		}
+		btnYear.disabled = "disabled";
 	}
 
 	getAllData();
@@ -167,7 +190,6 @@ btnYear.addEventListener("click", function(){
 // ------------ fetch url
 
 function getData(resolve, reject, year){
-
 	// dane dotyczące konkretnego roku zaciągane są tylko raz
 	if (!countriesData.date.hasOwnProperty(year)){
 		const countries = countriesList.join(";");
@@ -184,7 +206,6 @@ function getData(resolve, reject, year){
 				reject(err);
 			})
 	} else {
-		console.log("jest");
 		resolve(countriesData.date[year]);
 	}
 }
@@ -202,7 +223,7 @@ function getAllData(){
 	Promise.all([promise1, promise2])
 		.then(resp => {
 			dataReady = true;
-			fillTable(secondYear);
+			setTableData();
 			colorMap();
 			fillTooltip();
 			btnYear.removeAttribute("disabled");
@@ -211,3 +232,74 @@ function getAllData(){
 }
 
 getAllData();
+
+function sortTableData(categoryNr, isDescending){
+	const sortDir = isDescending ? "descending" : "ascending";
+	// countriesTable domyslnie jest posortowana rosnaco wg krajow (kategoria 0)
+	const newTab = countriesTable.slice();
+	if(categoryNr === 0){
+		if(isDescending) newTab.reverse();
+	} else {
+		newTab.sort(function(a, b){
+			if (!isDescending){
+				return a[categoryNr] - b[categoryNr];
+			} else {
+				return b[categoryNr] - a[categoryNr];
+			}
+		})
+	}
+
+	fillTable(newTab);
+};
+
+// --------------------- sort table EVENTS
+
+for (let i = 0; i < categories.length; i++) {
+	categories[i].addEventListener("click", function(e){
+		let isDescending = false;
+		let categoryNr;
+		const icon = this.children[1];
+		console.dir(icon);
+		for (var i = 0; i < icons.length; i++) {
+			if (icon !== icons[i]){
+				icons[i].classList.remove("visible");
+				icons[i].classList.remove("descending");
+			} else {
+				categoryNr = i;
+			}
+		}
+		if (icon.classList.contains("visible")){
+
+			isDescending = icon.classList.toggle("descending");
+			sortTableData(categoryNr, isDescending);
+		} else {
+			icon.classList.add("visible");
+			// domyslnie strzalka w gore
+			icon.classList.remove("descending");
+			sortTableData(categoryNr, isDescending);
+		}
+			// DODAĆ: funkcja odwracająca bieżące sortowanie
+
+			for (var i = 0; i < categories.length; i++) {
+				if(categories[i].children[1] !== icon){
+					categories[i].children[1].classList.remove("visible");
+				}
+			}
+
+	})
+}
+
+// for(cat of categories){
+// 	cat.addEventListener("click", function(){
+//
+// 		const icon = this.children[1];
+// 		if(icon.classList.contains("visible")){
+// 			// icon.classList.add("descending");
+// 		}else{
+// 			for(i=0; i<categories.length; i++){
+// 				el.children[1].classList.remove("visible");
+// 			}
+// 			icon.classList.add("visible");
+// 		}
+// 	})
+// }

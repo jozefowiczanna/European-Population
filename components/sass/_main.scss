@@ -137,12 +137,12 @@ header span {
 		font-size: 0.8rem;
 		top: 50%;
 		transform: translateY(-50%);
-		// visibility: hidden;
+		visibility: hidden;
 	}
 	.visible {
 		visibility: visible;
 	}
-	.i-down {
+	.descending {
 		transform: translateY(-50%) rotate(180deg);
 	}
 	.text-right {
@@ -157,9 +157,6 @@ header span {
 		background-color: $th-hover;
 		border-color: $th-hover;
 	}
-}
-.ascend {
-	visibility: visible;
 }
 
 
