@@ -6,9 +6,11 @@ const thSecondYear = document.querySelector(".th-second-year");
 const map = document.querySelector(".map");
 const tableBody = document.querySelector(".table-body");
 const countriesElements = document.querySelectorAll(".country");
-const populationYear = document.querySelector(".population-year");
 const categories = document.querySelectorAll(".table-population th");
 const icons = document.querySelectorAll(".table-population i");
+const smallBtnGroup = document.querySelector(".btn-small-years");
+const legendCnt = document.querySelector(".legend-cnt");
+const zoomIcons = document.querySelector(".zoom");
 
 const countriesList = ["al", "at", "by", "be", "ba", "bg", "hr", "cz", "dk", "ee", "mk", "fi", "fr", "de", "gr", "hu", "is", "ie", "it", "lv", "lt", "mt", "md", "me", "no", "pl", "pt", "ro", "ru", "rs", "sk", "si", "es", "se", "ch", "nl", "tr", "ua", "gb"];
 countriesList.sort();
@@ -42,17 +44,36 @@ function addYearsToForm(){
 }
 addYearsToForm()
 
-function colorMap(){
-	for(const c of countriesData.date[secondYear]){
-		current = document.querySelector(`[data-country="${c.country.value}"]`);
-		var population = (c.value === "undefined" || c.value === null) ? "no data available" : c.value;
-		current.dataset.population = population;
-		current.dataset.year = c.date;
+function applyDataset(){
+	for (const el of countriesTable){
+		const current = document.querySelector(`[data-country="${el[0]}"]`);
+		current.dataset.country = el[0];
+		current.dataset.population1 = el[1];
+		current.dataset.population2 = el[2];
+		current.dataset.difference = el[3];
+	}
+}
+
+
+
+
+
+function colorMap(year){
+	for (const el of countriesTable){
+		const current = document.querySelector(`[data-country="${el[0]}"]`);
+		if (year === firstYear){
+			var population = current.dataset.population1;
+		} else {
+			var population = current.dataset.population2;
+		}
 		current.classList.remove("fill-color1");
 		current.classList.remove("fill-color2");
 		current.classList.remove("fill-color3");
 		current.classList.remove("fill-color4");
 		current.classList.remove("fill-color5");
+		current.classList.remove("fill-color-red1");
+		current.classList.remove("fill-color-red2");
+		current.classList.remove("fill-color-red3");
 		if(population > 60000000){
 			current.classList.add("fill-color5");
 		}else if(population>30000000){
@@ -65,6 +86,92 @@ function colorMap(){
 			current.classList.add("fill-color1");
 		}
 	}
+}
+
+function colorMapDifference(){ // differnce - shades of green and red
+	for (const el of countriesTable){
+		const current = document.querySelector(`[data-country="${el[0]}"]`);
+		diff = parseInt(current.dataset.difference);
+		current.classList.remove("fill-color1");
+		current.classList.remove("fill-color2");
+		current.classList.remove("fill-color3");
+		current.classList.remove("fill-color4");
+		current.classList.remove("fill-color5");
+		current.classList.remove("fill-color-red1");
+		current.classList.remove("fill-color-red2");
+		current.classList.remove("fill-color-red3");
+		if(diff > 200000){
+			current.classList.add("fill-color5");
+		}else if (diff >= 100000 && diff <= 200000) {
+			current.classList.add("fill-color4");
+		}else if (diff >= 0 && diff <= 100000) {
+			current.classList.add("fill-color3");
+		}else if (diff >= -100000 && diff <= 0) {
+			current.classList.add("fill-color-red1");
+		}else if (diff >= -200000 && diff <= -100000){
+			current.classList.add("fill-color-red2");
+		}else if (diff < -200000){
+			current.classList.add("fill-color-red3");
+		}
+	}
+}
+
+function colorMapLegend(){
+	// apply different legend when compare button is active
+	let template;
+	console.log(smallBtnGroup.children[2].classList.contains("btn-on"));
+	if (smallBtnGroup.children[2].classList.contains("btn-on")){
+		template = `
+			<div class="legend">
+				<div class="color color-red3"></div>
+				<div>less than -200,000.</div>
+			</div>
+			<div class="legend">
+				<div class="color color-red2"></div>
+				<div>-200,000 to -100,000</div>
+			</div>
+			<div class="legend"	>
+				<div class="color color-red1"></div>
+				<div>-100,000 to 0</div>
+			</div>
+			<div class="legend">
+				<div class="color color3"></div>
+				<div>0 to 100,000</div>
+			</div>
+			<div class="legend">
+				<div class="color color4"></div>
+				<div>100,000 to 200,000</div>
+			</div>
+			<div class="legend">
+				<div class="color color5"></div>
+				<div>over 200,000</div>
+			</div>
+		`;
+	} else {
+		template = `
+		<div class="legend">
+			<div class="color color1"></div>
+			<div>0-5 mln</div>
+		</div>
+		<div class="legend">
+			<div class="color color2"></div>
+			<div>5-10 mln</div>
+		</div>
+		<div class="legend">
+			<div class="color color3"></div>
+			<div>10-30 mln</div>
+		</div>
+		<div class="legend">
+			<div class="color color4"></div>
+			<div>30-60 mln</div>
+		</div>
+		<div class="legend">
+			<div class="color color5"></div>
+			<div>over 60 mln</div>
+		</div>
+		`;
+	}
+	legendCnt.innerHTML = template;
 }
 
 // --------------------- fill table
@@ -131,12 +238,28 @@ function fillTooltip(){
 		let orgFill = el.style.fill;
 		el.addEventListener("mousemove", function(e){
 			// this.style.fill = "#676767";
-			const population = numberWithSpaces(this.dataset.population);
+			const population1 = numberWithSpaces(this.dataset.population1);
+			const population2 = numberWithSpaces(this.dataset.population2);
+			let difference = numberWithSpaces(this.dataset.difference);
+			if (difference !== "NO DATA"){
+				if(difference[0] !== "-"){
+					difference = "+" + difference;
+					textColor = "green-nr";
+				} else {
+					textColor = "red-nr";
+				}
+			}
 			tooltip.innerHTML =
 			`
 			<h3>${this.dataset.country}</h3>
+			<div>Population (${firstYear}):
+				${population1}
+			</div>
 			<div>Population (${secondYear}):
-				${population}
+				${population2}
+			</div>
+			<div>Difference:
+				<span class="${textColor}">${difference}</span>
 			</div>
 			`;
 
@@ -163,10 +286,11 @@ function fillTooltip(){
 // ---------------------------- btnYear click
 
 btnYear.addEventListener("click", function(){
-	populationYear.innerHTML = selectSecondYear.value;
 	if(selectFirstYear.value === selectSecondYear.value){
 		alert("Select two different years!");
 	}else{
+		resetButtons(smallBtnGroup.children[1]);
+		colorMapLegend();
 		// reset icon in table
 		for (var i = 0; i < icons.length; i++) {
 			icons[i].classList.remove("visible");
@@ -181,17 +305,18 @@ btnYear.addEventListener("click", function(){
 			firstYear = parseInt(selectSecondYear.value, 10);
 			secondYear = parseInt(selectFirstYear.value, 10);
 		}
+		// change small buttons values
+		smallBtnGroup.children[0].innerHTML = firstYear;
+		smallBtnGroup.children[1].innerHTML = secondYear;
 		btnYear.disabled = "disabled";
 	}
-
 	getAllData();
 })
 
 // ------------ fetch url
 
 function getData(resolve, reject, year){
-	// dane dotyczące konkretnego roku zaciągane są tylko raz
-	if (!countriesData.date.hasOwnProperty(year)){
+	if (!countriesData.date.hasOwnProperty(year)){ // don't download the same data twice
 		const countries = countriesList.join(";");
 		const url = "https://api.worldbank.org/v2/countries/"+countries+"/indicators/SP.POP.TOTL?date="+year+"&format=json";
 		fetch(url)
@@ -224,7 +349,8 @@ function getAllData(){
 		.then(resp => {
 			dataReady = true;
 			setTableData();
-			colorMap();
+			applyDataset();
+			colorMap(secondYear);
 			fillTooltip();
 			btnYear.removeAttribute("disabled");
 		}).catch(err => console.log(err))
@@ -259,7 +385,6 @@ for (let i = 0; i < categories.length; i++) {
 		let isDescending = false;
 		let categoryNr;
 		const icon = this.children[1];
-		console.dir(icon);
 		for (var i = 0; i < icons.length; i++) {
 			if (icon !== icons[i]){
 				icons[i].classList.remove("visible");
@@ -289,17 +414,39 @@ for (let i = 0; i < categories.length; i++) {
 	})
 }
 
-// for(cat of categories){
-// 	cat.addEventListener("click", function(){
-//
-// 		const icon = this.children[1];
-// 		if(icon.classList.contains("visible")){
-// 			// icon.classList.add("descending");
-// 		}else{
-// 			for(i=0; i<categories.length; i++){
-// 				el.children[1].classList.remove("visible");
-// 			}
-// 			icon.classList.add("visible");
-// 		}
-// 	})
-// }
+// -------------------------- small buttons event
+
+
+function resetButtons(target){
+	const buttons = smallBtnGroup.querySelectorAll("button");
+	for (b of buttons){
+		b.classList.add("btn-off");
+		b.classList.add("btn-outline-dark");
+		b.classList.remove("btn-on");
+		b.classList.remove("btn-dark");
+	}
+	target.classList.remove("btn-off");
+	target.classList.remove("btn-outline-dark");
+	target.classList.add("btn-on");
+	target.classList.add("btn-dark");
+	return buttons;
+}
+
+smallBtnGroup.addEventListener("click", function(e){
+	const year =  parseInt(e.target.innerHTML);
+	const target = e.target;
+	const buttons = resetButtons(target);
+	if(e.target === buttons[2]){
+		colorMapDifference();
+	} else {
+		colorMap(year);
+	}
+	colorMapLegend();
+})
+
+
+zoomIcons.addEventListener("click", function(e){
+	if (e.target !== e.currentTarget){
+		console.log("ok");
+	}
+})

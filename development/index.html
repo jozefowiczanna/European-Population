@@ -23,14 +23,16 @@
 		<div class="form-cnt">
 
 			<form class="get-data">
-
 				<label for="select-first-year">Choose two years between 1960-2017 and compare total population</label>
-			  <select class="form-control" id="select-first-year" name="select-first-year">
-				</select>
-				<label for="select-second-year" aria-hidden="true">Select second year</label>
-			  <select class="form-control" id="select-second-year" name="select-second-year">
-				</select>
-				<button type="button" class="btn-year">Get data</button>
+				<div class="select-group">
+				  <select class="form-control" id="select-first-year" name="select-first-year">
+					</select>
+					<label for="select-second-year" aria-hidden="true">Select second year</label>
+				  <select class="form-control" id="select-second-year" name="select-second-year">
+					</select>
+					<button type="button" class="btn btn-secondary btn-year">Get data</button>
+				</div>
+				<div><a href="#table" class="table-link">Scroll to table</a></div>
 			</form>
 
 		</div>
@@ -55,29 +57,41 @@
 
 					<div class="map-legend">
 
-						<div class="population">Population in <span class="population-year">2017</span>:</div>
-						<div class="legend">
-							<div class="color color1"></div>
-							<div>0-5 mln</div>
+						<div class="population">
+							<span>Population in</span>
+							<div class="btn-group btn-small-years" role="group" aria-label="Basic example">
+							  <button type="button" class="btn btn-outline-dark btn-sm btn-off">2016</button>
+							  <button type="button" class="btn btn-dark btn-sm btn-on">2017</button>
+								<button type="button" class="btn btn-outline-dark btn-sm btn-off">compare</button>
+							</div>
 						</div>
-						<div class="legend">
-							<div class="color color2"></div>
-							<div>5-10 mln</div>
-						</div>
-						<div class="legend">
-							<div class="color color3"></div>
-							<div>10-30 mln</div>
-						</div>
-						<div class="legend">
-							<div class="color color4"></div>
-							<div>30-60 mln</div>
-						</div>
-						<div class="legend">
-							<div class="color color5"></div>
-							<div>over 60 mln</div>
+						<div class="legend-cnt">
+							<div class="legend">
+								<div class="color color1"></div>
+								<div>0-5 mln</div>
+							</div>
+							<div class="legend">
+								<div class="color color2"></div>
+								<div>5-10 mln</div>
+							</div>
+							<div class="legend">
+								<div class="color color3"></div>
+								<div>10-30 mln</div>
+							</div>
+							<div class="legend">
+								<div class="color color4"></div>
+								<div>30-60 mln</div>
+							</div>
+							<div class="legend">
+								<div class="color color5"></div>
+								<div>over 60 mln</div>
+							</div>
 						</div>
 
-
+						<div class="zoom">
+							<i class="fas fa-plus-circle"></i>
+							<i class="fas fa-minus-circle"></i>
+						</div>
 
 					</div>
 					<svg version="1.1" id="map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1575 1329">
