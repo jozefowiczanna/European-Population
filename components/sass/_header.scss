@@ -1,0 +1,15 @@
+.header-wrapper {
+	background-color: $header-green;
+	padding: 0.5em 0;
+	margin-bottom: 1em;
+
+	h2 {
+		font-size: 1.7rem;
+	}
+
+	.title {
+		font-size: 0.7em;
+		display: block;
+		margin-top: 0.2em;
+	}
+}
