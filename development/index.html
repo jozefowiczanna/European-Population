@@ -22,52 +22,58 @@
 	<main class="cnt">
 		<div class="search">
 			<form class="get-data">
-				<label for="select-first-year">Choose two years between 1960-2017 and compare total population</label>
+				<div>
+					Choose two years between 1960-2017
+				</div>
 				<div class="select-group">
+					<label for="select-first-year" aria-hidden="true">Select first year</label>
 				  <select class="form-control" id="select-first-year" name="select-first-year">
 					</select>
 					<label for="select-second-year" aria-hidden="true">Select second year</label>
 				  <select class="form-control" id="select-second-year" name="select-second-year">
 					</select>
-					<button type="button" class="btn btn-secondary btn-year">Get data</button>
 				</div><!-- select-group -->
-				<div>
-					<a href="#table" class="table-link">Scroll to table</a>
-				</div>
+				<button type="button" class="btn btn-secondary btn-get-data">Get data</button>
 			</form><!-- get-data -->
 		</div><!-- search -->
 		<div class="content">
 			<div class="map-cnt">
 				<div class="map-nav">
 					<div class="legend-cnt">
+						<div class="color-info">
+							Color map according to data from year:
+						</div>
 						<div class="legend-options">
-							<span>Population in</span>
 							<div class="btn-group btn-small-years" role="group" aria-label="Basic example">
-								<button type="button" class="btn btn-outline-dark btn-sm btn-off">2016</button>
+								<button type="button" class="btn btn-outline-dark btn-off">2016</button>
 								<button type="button" class="btn btn-dark btn-sm btn-on">2017</button>
 								<button type="button" class="btn btn-outline-dark btn-sm btn-off">compare</button>
 							</div>
 						</div><!-- legend-options  -->
-						<div class="legend-color-group">
-							<div class="legend-item">
-								<div class="color color1"></div>
-								<div>0-5 mln</div>
+						<div class="legend-color-group flex">
+							<div class="legend-col">
+								<div class="legend-item">
+									<div class="color-box color1"></div>
+									<div>0-5 mln</div>
+								</div>
+								<div class="legend-item">
+									<div class="color-box color2"></div>
+									<div>5-10 mln</div>
+								</div>
+								<div class="legend-item">
+									<div class="color-box color3"></div>
+									<div>10-30 mln</div>
+								</div>
 							</div>
-							<div class="legend-item">
-								<div class="color color2"></div>
-								<div>5-10 mln</div>
-							</div>
-							<div class="legend-item">
-								<div class="color color3"></div>
-								<div>10-30 mln</div>
-							</div>
-							<div class="legend-item">
-								<div class="color color4"></div>
-								<div>30-60 mln</div>
-							</div>
-							<div class="legend-item">
-								<div class="color color5"></div>
-								<div>over 60 mln</div>
+							<div class="legend-col">
+								<div class="legend-item">
+									<div class="color-box color4"></div>
+									<div>30-60 mln</div>
+								</div>
+								<div class="legend-item">
+									<div class="color-box color5"></div>
+									<div>over 60 mln</div>
+								</div>
 							</div>
 						</div><!-- legend-color-group -->
 					</div><!-- legend-cnt -->
@@ -77,7 +83,7 @@
 					</div><!-- zoom -->
 				</div><!-- map-nav -->
 				<div class="map-scroll">
-					<div class="map-svg-cnt">
+					<div class="map-svg-cnt zoom-val1">
 						<svg version="1.1" id="map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1575 1329">
 							<g class="country" data-country="Bosnia and Herzegovina">
 								<g>
@@ -1008,9 +1014,9 @@
 				  <thead class="thead-dark">
 				    <tr>
 				      <th scope="col"><span>Country</span><i class="fas fa-angle-up visible"></i></th>
-				      <th scope="col" class="text-right"><span class="th-first-year">2016</span><i class="fas fa-angle-up"></i></th>
-							<th scope="col" class="text-right"><span class="th-second-year">2017</span><i class="fas fa-angle-up"></i></th>
-							<th scope="col" class="text-right"><span>Compare</span><i class="fas fa-angle-up"></i></th>
+				      <th scope="col" class="right"><span class="th-first-year">2016</span><i class="fas fa-angle-up"></i></th>
+							<th scope="col" class="right"><span class="th-second-year">2017</span><i class="fas fa-angle-up"></i></th>
+							<th scope="col" class="right"><span>Diff.</span><i class="fas fa-angle-up"></i></th>
 				    </tr>
 				  </thead>
 				  <tbody class="table-body">
@@ -1023,6 +1029,13 @@
 	<footer>
 
 	</footer>
+
+	<div class="map-tooltip">
+		<div class="tooltip-content"></div>
+		<i class="far fa-times-circle close-icon"></i>
+	</div>
+	<div class="dark-bg">
+	</div>
 
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>

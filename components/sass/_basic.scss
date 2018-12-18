@@ -1,5 +1,14 @@
+body {
+	// position: relative;
+}
+
 .cnt {
 	max-width: 1600px;
 	margin: 0 auto;
 	padding: 0 1em;
 }
+
+//colors used in table and tooltip
+.green-nr {color: $green-nr;}
+.red-nr {color: $red-nr;}
+.black-nr {color: $text-color;}

@@ -1,16 +1,23 @@
-const btnYear = document.querySelector(".btn-year");
+const btnGetData = document.querySelector(".btn-get-data");
 const selectFirstYear = document.querySelector("#select-first-year");
 const selectSecondYear = document.querySelector("#select-second-year");
 const thFirstYear = document.querySelector(".th-first-year");
 const thSecondYear = document.querySelector(".th-second-year");
-const map = document.querySelector(".map");
+const map = document.querySelector(".map-svg-cnt");
+const mapScroll = document.querySelector(".map-scroll");
 const tableBody = document.querySelector(".table-body");
 const countriesElements = document.querySelectorAll(".country");
-const categories = document.querySelectorAll(".table-population th");
-const icons = document.querySelectorAll(".table-population i");
+const categories = document.querySelectorAll(".table th");
+const icons = document.querySelectorAll(".table i");
 const smallBtnGroup = document.querySelector(".btn-small-years");
-const legendCnt = document.querySelector(".legend-cnt");
+const legendColorGroup = document.querySelector(".legend-color-group");
 const zoomIcons = document.querySelector(".zoom");
+const zoomPlus = zoomIcons.children[0];
+const zoomMinus = zoomIcons.children[1];
+
+const style = window.getComputedStyle(mapScroll);
+const width = style.getPropertyValue("width");
+console.log(width);
 
 const countriesList = ["al", "at", "by", "be", "ba", "bg", "hr", "cz", "dk", "ee", "mk", "fi", "fr", "de", "gr", "hu", "is", "ie", "it", "lv", "lt", "mt", "md", "me", "no", "pl", "pt", "ro", "ru", "rs", "sk", "si", "es", "se", "ch", "nl", "tr", "ua", "gb"];
 countriesList.sort();
@@ -21,9 +28,10 @@ let countriesData = {
 let firstYear = 2016;
 let secondYear = 2017;
 
-const tooltip = document.createElement("div");
-tooltip.classList.add("map-tooltip");
-document.body.appendChild(tooltip);
+const tooltip = document.querySelector(".map-tooltip");
+const tooltipContent = tooltip.querySelector(".tooltip-content");
+const closeIcon = tooltip.querySelector(".close-icon");
+const darkBg = document.querySelector(".dark-bg")
 
 function numberWithSpaces(nr) { // 5000000 -> 5 000 000 (non-breaking space)
     return nr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "&nbsp");
@@ -116,62 +124,71 @@ function colorMapDifference(){ // differnce - shades of green and red
 	}
 }
 
-function colorMapLegend(){
+function showLegend(){
 	// apply different legend when compare button is active
 	let template;
-	console.log(smallBtnGroup.children[2].classList.contains("btn-on"));
 	if (smallBtnGroup.children[2].classList.contains("btn-on")){
+		legendColorGroup.classList.remove("flex");
 		template = `
-			<div class="legend">
-				<div class="color color-red3"></div>
+		<div class="legend-col">
+			<div class="legend-item">
+				<div class="color-box color-red3"></div>
 				<div>less than -200,000.</div>
 			</div>
-			<div class="legend">
-				<div class="color color-red2"></div>
+			<div class="legend-item">
+				<div class="color-box color-red2"></div>
 				<div>-200,000 to -100,000</div>
 			</div>
-			<div class="legend"	>
-				<div class="color color-red1"></div>
+			<div class="legend-item">
+				<div class="color-box color-red1"></div>
 				<div>-100,000 to 0</div>
 			</div>
-			<div class="legend">
-				<div class="color color3"></div>
+		</div>
+		<div class="legend-col">
+			<div class="legend-item">
+				<div class="color-box color3"></div>
 				<div>0 to 100,000</div>
 			</div>
-			<div class="legend">
-				<div class="color color4"></div>
+			<div class="legend-item">
+				<div class="color-box color4"></div>
 				<div>100,000 to 200,000</div>
 			</div>
-			<div class="legend">
-				<div class="color color5"></div>
+			<div class="legend-item">
+				<div class="color-box color5"></div>
 				<div>over 200,000</div>
 			</div>
+		</div>
 		`;
 	} else {
+		legendColorGroup.classList.add("flex");
 		template = `
-		<div class="legend">
-			<div class="color color1"></div>
-			<div>0-5 mln</div>
+		<div class="legend-col">
+			<div class="legend-item">
+				<div class="color-box color1"></div>
+				<div>0-5 mln</div>
+			</div>
+			<div class="legend-item">
+				<div class="color-box color2"></div>
+				<div>5-10 mln</div>
+			</div>
+			<div class="legend-item">
+				<div class="color-box color3"></div>
+				<div>10-30 mln</div>
+			</div>
 		</div>
-		<div class="legend">
-			<div class="color color2"></div>
-			<div>5-10 mln</div>
-		</div>
-		<div class="legend">
-			<div class="color color3"></div>
-			<div>10-30 mln</div>
-		</div>
-		<div class="legend">
-			<div class="color color4"></div>
-			<div>30-60 mln</div>
-		</div>
-		<div class="legend">
-			<div class="color color5"></div>
-			<div>over 60 mln</div>
+		<div class="legend-col">
+			<div class="legend-item">
+				<div class="color-box color4"></div>
+				<div>30-60 mln</div>
+			</div>
+			<div class="legend-item">
+				<div class="color-box color5"></div>
+				<div>over 60 mln</div>
+			</div>
 		</div>
 		`;
 	}
-	legendCnt.innerHTML = template;
+	legendColorGroup.innerHTML = template;
 }
 
 // --------------------- fill table
@@ -237,7 +254,6 @@ function fillTooltip(){
 	for(el of countriesElements){
 		let orgFill = el.style.fill;
 		el.addEventListener("mousemove", function(e){
-			// this.style.fill = "#676767";
 			const population1 = numberWithSpaces(this.dataset.population1);
 			const population2 = numberWithSpaces(this.dataset.population2);
 			let difference = numberWithSpaces(this.dataset.difference);
@@ -249,7 +265,8 @@ function fillTooltip(){
 					textColor = "red-nr";
 				}
 			}
-			tooltip.innerHTML =
+			tooltip.style.display = "";
+			tooltipContent.innerHTML =
 			`
 			<h3>${this.dataset.country}</h3>
 			<div>Population (${firstYear}):
@@ -263,34 +280,46 @@ function fillTooltip(){
 			</div>
 			`;
 
+
 			const winWidth = window.outerWidth;
-			const tooltipStyle = window.getComputedStyle(tooltip);
-			const tooltipWidth = parseInt(tooltipStyle.getPropertyValue("width"));
-			if((e.pageX + 300) > winWidth){
-				tooltip.style.left = e.pageX - tooltipWidth - 15 + "px";
-			}else{
-				tooltip.style.left = e.pageX + 15 + "px";
+			if (winWidth < 600){
+				tooltip.classList.add("fixed");
+			} else {
+				const tooltipStyle = window.getComputedStyle(tooltip);
+				const tooltipWidth = parseInt(tooltipStyle.getPropertyValue("width"));
+				if((e.pageX + 300) > winWidth){
+					tooltip.style.left = e.pageX - tooltipWidth - 15 + "px";
+				}else{
+					tooltip.style.left = e.pageX + 15 + "px";
+				}
+				tooltip.style.top = e.pageY + 15 + "px";
+				tooltip.style.display = "";
+				closeIcon.style.display = "none";
 			}
-			tooltip.style.top = e.pageY + 15 + "px";
-			tooltip.style.display = "";
 		})
 
-		el.addEventListener("mouseout", function(){
-			this.style.fill = orgFill;
-			tooltip.innerHTML = "";
-			tooltip.style.display = "none";
-		})
+		// el.addEventListener("mouseout", function(){
+		// 	this.style.fill = orgFill;
+		// 	tooltip.innerHTML = "";
+		// 	tooltip.style.display = "none";
+		// })
 	}
 }
+console.log(closeIcon);
 
-// ---------------------------- btnYear click
+closeIcon.addEventListener("click", function(){
+	console.log("test");
+	tooltip.style.display = "none";
+})
 
-btnYear.addEventListener("click", function(){
+// ---------------------------- btnGetData click
+
+btnGetData.addEventListener("click", function(){
 	if(selectFirstYear.value === selectSecondYear.value){
 		alert("Select two different years!");
 	}else{
 		resetButtons(smallBtnGroup.children[1]);
-		colorMapLegend();
+		showLegend();
 		// reset icon in table
 		for (var i = 0; i < icons.length; i++) {
 			icons[i].classList.remove("visible");
@@ -308,7 +337,7 @@ btnYear.addEventListener("click", function(){
 		// change small buttons values
 		smallBtnGroup.children[0].innerHTML = firstYear;
 		smallBtnGroup.children[1].innerHTML = secondYear;
-		btnYear.disabled = "disabled";
+		btnGetData.disabled = "disabled";
 	}
 	getAllData();
 })
@@ -352,7 +381,7 @@ function getAllData(){
 			applyDataset();
 			colorMap(secondYear);
 			fillTooltip();
-			btnYear.removeAttribute("disabled");
+			btnGetData.removeAttribute("disabled");
 		}).catch(err => console.log(err))
 
 }
@@ -441,12 +470,37 @@ smallBtnGroup.addEventListener("click", function(e){
 	} else {
 		colorMap(year);
 	}
-	colorMapLegend();
+	showLegend();
 })
 
+const sizes = ["zoom-val0", "zoom-val1", "zoom-val2", "zoom-val3", "zoom-val4"];
 
-zoomIcons.addEventListener("click", function(e){
-	if (e.target !== e.currentTarget){
-		console.log("ok");
+zoomPlus.addEventListener("click", function(e){
+	for (let i = 0; i < sizes.length - 1; i++) {
+		if(map.classList.contains(sizes[i])){
+			console.log(sizes[i], "plus");
+			map.classList.remove(sizes[i]);
+			map.classList.add(sizes[i+1]);
+			break;
+		}
 	}
+})
+
+zoomMinus.addEventListener("click", function(e){
+	for (let i = sizes.length - 1; i >= 1; i--) {
+		console.log(sizes[i]);
+		if(map.classList.contains(sizes[i])){
+			console.log(sizes[i], "minus");
+			map.classList.remove(sizes[i]);
+			map.classList.add(sizes[i-1]);
+			break;
+		}
+	}
+})
+
+window.addEventListener("resize", function(){
+	console.log("test");
+	darkBg.style.display = "none";
+	tooltip.innerHTML = "";
+	tooltip.style.display = "none";
 })

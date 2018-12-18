@@ -1,0 +1,94 @@
+.legend-cnt {
+	margin-bottom: 0.7rem;
+}
+
+.color-info {
+	margin-bottom: 0.5rem;
+}
+
+.legend-options {
+
+	.btn-group, .btn {
+		width: 100%;
+	}
+
+	.btn {
+		border-radius: 0;
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	.btn-on {
+		background-color: $btn-on;
+		border-color: $btn-on;
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
+
+	.btn-off {
+		border-color: $btn-border;
+		color: $btn-text;
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
+
+.flex {
+	display: flex;
+}
+
+.legend-color-group {
+	border: 1px solid $btn-border;
+	border-top: none;
+	padding: 0.5rem;
+}
+
+.legend-col {
+	margin-right: 1rem;
+}
+
+.legend-item {
+	font-size: 0.9rem;
+	display: flex;
+	align-items: center;
+}
+
+.color-box {
+	width: 25px;
+	height: 25px;
+	margin-right: 0.5em;
+	flex-shrink: 0;
+}
+
+.color1 {background-color: $yellow}
+.color2 {background-color: $green-bright}
+.color3 {background-color: $green-light}
+.color4 {background-color: $green-medium}
+.color5 {background-color: $green-dark}
+
+.color-red1 {background-color: $red-light}
+.color-red2 {background-color: $red-medium}
+.color-red3 {background-color: $red-dark}
+
+.fill-color1 {fill: $yellow}
+.fill-color2 {fill: $green-bright}
+.fill-color3 {fill: $green-light}
+.fill-color4 {fill: $green-medium}
+.fill-color5 {fill: $green-dark}
+
+.fill-color-red1 {fill: $red-light}
+.fill-color-red2 {fill: $red-medium}
+.fill-color-red3 {fill: $red-dark}
+
+.zoom {
+	font-size: 1.2rem;
+	color: $zoom;
+
+	i {
+		cursor: pointer;
+	}
+}

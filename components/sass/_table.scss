@@ -1,0 +1,44 @@
+.table-cnt {
+	overflow: auto;
+	margin: 1rem -0.8rem;
+	font-size: 0.85rem;
+}
+.table {
+	th {
+		position: relative;
+		cursor: pointer;
+	}
+	i {
+		position: absolute;
+		margin-left: 10px;
+		font-size: 0.8rem;
+		top: 50%;
+		transform: translateY(-50%);
+		visibility: hidden;
+	}
+	.visible {
+		visibility: visible;
+	}
+	.descending {
+		transform: translateY(-50%) rotate(180deg);
+	}
+
+	tr:hover {
+		background-color: $tr-hover;
+		border-color: $th-hover;
+	}
+
+	th:hover {
+		background-color: $th-hover;
+
+	}
+
+	.right {
+		text-align: right;
+		padding-right: 25px;
+	}
+
+	td {
+		padding: 0.3rem;
+	}
+}
