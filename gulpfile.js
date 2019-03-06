@@ -3,11 +3,12 @@ const gulp = require('gulp'),
 		compass = require('gulp-compass'),
 		path = require('path'),
 		connect = require('gulp-connect'),
+		concat = require('gulp-concat'),
 		replace = require('gulp-replace');
 
 const sassSources = ['components/sass/style.scss'];
 const htmlSources = ['development/*.html'];
-const jsSources = ['development/js/*.js'];
+const jsFinal = ['development/js/*.js'];
 
 gulp.task('compass', function(done){
 	gulp.src(sassSources)
@@ -30,7 +31,7 @@ gulp.task('html', function(done){
 });
 
 gulp.task('js', function(done){
-	gulp.src(jsSources)
+	gulp.src(jsFinal)
 	.pipe(connect.reload());
 	done();
 });
@@ -38,7 +39,7 @@ gulp.task('js', function(done){
 gulp.task('watch', function(){
 	gulp.watch('components/sass/*.scss', gulp.series('compass'));
 	gulp.watch(htmlSources, gulp.series('html'));
-	gulp.watch(jsSources, gulp.series('js'));
+	gulp.watch(jsFinal, gulp.series('js'));
 });
 
 gulp.task('connect', function(){

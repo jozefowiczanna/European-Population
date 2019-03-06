@@ -11,3 +11,32 @@
 		}
 	}
 }
+
+
+@media screen and (min-width: 700px){
+	.cnt {
+		padding: 0 1rem;
+	}
+
+	.form-control {
+		width: auto;
+	}
+
+	.btn-get-data {
+		width: auto;
+		padding: 0.4rem 3rem;
+	}
+
+	.legend-cnt {
+		width: 400px;
+	}
+
+	.map-scroll {
+		margin: 0;
+	}
+
+	.table-cnt {
+		max-width: 700px;
+		margin: 1rem auto;
+	}
+}

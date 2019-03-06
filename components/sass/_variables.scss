@@ -25,8 +25,24 @@ $btn-on: #333;
 $zoom: #aaa;
 
 // map sizes
-$zoom-val0: 100%;
-$zoom-val1: 150%;
-$zoom-val2: 200%;
-$zoom-val3: 250%;
-$zoom-val4: 300%;
+$zoom-val0: 50%;
+$zoom-val1: 80%;
+$zoom-val2: 100%;
+$zoom-val3: 150%;
+$zoom-val4: 200%;
+$zoom-val5: 250%;
+$zoom-val6: 300%;
+
+.zoom-val0 {width: $zoom-val0}
+.zoom-val1 {width: $zoom-val1}
+.zoom-val2 {width: $zoom-val2}
+.zoom-val3 {width: $zoom-val3}
+.zoom-val4 {width: $zoom-val4}
+.zoom-val5 {width: $zoom-val5}
+.zoom-val6 {width: $zoom-val6}
+
+// $zoom-val0: 100%;
+// $zoom-val1: 150%;
+// $zoom-val2: 200%;
+// $zoom-val3: 250%;
+// $zoom-val4: 300%;
