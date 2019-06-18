@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/goniczanka/map-test.git"
+    "url": "git+https://github.com/jozefowiczanna/European-Population.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/goniczanka/map-test/issues"
+    "url": "https://github.com/jozefowiczanna/European-Population/issues"
   },
-  "homepage": "https://github.com/goniczanka/map-test#readme",
+  "homepage": "https://github.com/jozefowiczanna/European-Population#readme",
   "devDependencies": {
     "fancy-log": "^1.3.2",
     "gulp": "^4.0.0",

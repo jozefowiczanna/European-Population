@@ -16,7 +16,7 @@ gulp.task('compass', function(done){
 		css: 'development/css',
 		sass: path.normalize(__dirname+'/components/sass'),
 		style: 'expanded',
-		comments: true
+		comments: false
 	}))
 	.on('error', console.log)
 	.pipe(gulp.dest('development/css'))
